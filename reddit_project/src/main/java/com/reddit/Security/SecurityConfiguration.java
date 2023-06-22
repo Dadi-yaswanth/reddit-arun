@@ -24,7 +24,8 @@ public class SecurityConfiguration {
                     "/home",
                     "/login",
                     "/newRegister",
-                    "/addUser"
+                    "/addUser",
+                    "/search/**"
             };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

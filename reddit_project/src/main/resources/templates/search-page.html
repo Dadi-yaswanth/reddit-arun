@@ -46,7 +46,7 @@
                            th:href="@{'/search/?q=' + ${searchWord} + '&type=post'}"
                            th:classappend="${(!type.equalsIgnoreCase('user'))
                            && (!type.equalsIgnoreCase('sr')) ? 'option-active' : ''}"
-                           >Posts</a>
+                        >Posts</a>
                     </div>
 
                     <div class="result-option">
@@ -64,42 +64,47 @@
 
                 <div id="results">
                     <!-- Result for posts -->
-                    <div th:if="${(!type.equalsIgnoreCase('user')) && (!type.equalsIgnoreCase('sr'))}">
-                        <a href="" class="result-link" th:each=" post: ${searchData}">
-                            <div class="result">
-                                <div class="result-user-info">
-                                    <a href="" class="post-c-name" th:if="${post.getIsCommunity()}">
-                                        <h4 th:text="${'r/' + post.getCommunity().getCommunityName()}"></h4>
-                                    </a>
+                    <div th:if="${(!type.equalsIgnoreCase('user')) && (!type.equalsIgnoreCase('sr'))}" th:remove="tag">
+                        <div th:each=" post: ${searchData}" th:remove="tag">
+                            <a href="#" class="result-link">
+                                <div class="result">
+                                    <div class="result-user-info">
+                                        <a href="" class="post-c-name" th:if="${post.getIsCommunity()}">
+                                            <h4 th:text="${'r/' + post.getCommunity().getCommunityName()}"></h4>
+                                        </a>
 
-                                    <a href="" class="post-c-name" th:if="${!post.getIsCommunity()}">
-                                        <h th:text="${'u/' + post.getUser().getUsername()}"></h>
-                                    </a>
+                                        <a href="" th:href="@{'/u/' + ${post.getUser().getUsername()}}" class="post-c-name" th:if="${!post.getIsCommunity()}">
+                                            <h4 th:text="${'u/' + post.getUser().getUsername()}"></h4>
+                                        </a>
 
-                                    <p style="margin:0px 5px">. posted by</p>
-                                    <a href="" class="post-c-name">
-                                        <h4 th:text="${'u/' + post.getUser().getUsername()}"></h4>
-                                    </a>
-                                    <p style="margin-left: 5px">on
-                                        <span th:text="${#dates.format(post.getPublishedAt(),'dd-MMMM-yyyy')}"></span>
-                                    </p>
-                                </div>
-                                <div class="result-post-data">
-                                    <div class="result-post-content">
-                                        <p th:text="${post.getTitle()}"></p>
+                                        <p style="margin:0px 5px">. posted by</p>
+                                        <a href="" class="post-c-name">
+                                            <h4 th:text="${'u/' + post.getUser().getUsername()}"></h4>
+                                        </a>
+                                        <p style="margin-left: 5px">on
+                                            <span th:text="${#dates.format(post.getPublishedAt(),'dd-MMMM-yyyy')}"></span>
+                                        </p>
+                                    </div>
+                                    <a th:href="@{'/' + ${post.isCommunity ? 'r/'+ post.getCommunity().getCommunityName() : 'u/' + post.getUser().getUsername()} + '/comments/' + ${post.getPostId()}}">
+                                        <div class="result-post-data">
+                                            <div class="result-post-content">
+                                                <p th:text="${post.getTitle()}"></p>
 
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="result-post-values">
+                                        <p class="value-name">
+                                            <span class="result-values" th:text="${post.getUpVotes()}"></span>upvote
+                                        </p>
+                                        <p class="value-name">
+                                            <span class="result-values"
+                                                  th:text="${post.getComments() != null ? post.getComments().size() : '0' }"></span>Comments
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="result-post-values">
-                                    <p class="value-name">
-                                        <span class="result-values" th:text="${post.getUpVotes()}"></span>upvote
-                                    </p>
-                                    <p class="value-name">
-                                        <span class="result-values" th:text="${post.getComments() != null ? post.getComments().size() : '0' }"></span>Comments
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                     <!-- Result for community -->
 

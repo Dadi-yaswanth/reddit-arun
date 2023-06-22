@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Reddit</title>
+    <title>Reddit | Home</title>
     <link rel="stylesheet" th:href="@{/css/home.css}"/>
 </head>
 <body>
@@ -41,12 +41,23 @@
             <div id="posts-div">
                 <div class="post" th:each="postData : ${allPosts}">
                     <div class="post-vote-container">
-                        <a href=""><img th:src="@{images/upvote.png}" alt="" class="vote-img"/></a>
+                        <form action="" method="post" th:id="${'up-form-' + postData.getPostId()}"
+                              th:action="@{'/'+${postData.isCommunity ? 'r/' + postData.getCommunity().getCommunityName() : 'u/' + postData.getUser().getUsername()} +'/'+ ${postData.getPostId()}  + '/upvote'}"></form>
+                        <img
+                                th:src="@{/images/upvote.png}"
+                                alt=""
+                                class="vote-img upvote"
+                                th:id="${'post-up-' + postData.getPostId()}"
+                        />
                         <p th:text="${postData.getUpVotes() -  postData.getDownVotes()}"></p>
-                        <a href=""
-
-                        ><img th:src="@{images/downvote.png}" alt="" class="vote-img"
-                        /></a>
+                        <form action="" method="post"  th:id="${'down-form-' + postData.getPostId()}"
+                              th:action="@{'/'+${postData.isCommunity ? 'r/' + postData.getCommunity().getCommunityName() : 'u/' + postData.getUser().getUsername()} +'/'+ ${postData.getPostId()}  + '/down-vote'}"></form>
+                        <img
+                                th:src="@{/images/downvote.png}"
+                                alt=""
+                                class="vote-img downvote"
+                                th:id="${'post-down-' + postData.getPostId()}"
+                        />
                     </div>
 
                     <div class="post-data">
@@ -219,5 +230,6 @@
         </div>
     </nav>
 </main>
+<script th:src="@{/js/home.js}"></script>
 </body>
 </html>

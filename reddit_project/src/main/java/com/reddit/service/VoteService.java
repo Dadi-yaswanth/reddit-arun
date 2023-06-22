@@ -20,9 +20,9 @@ public class VoteService {
     private final PostDownVoteRepository postDownVoteRepository;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
-    public void commentUpVote(Long postId, Long commentId) {
-        User user = userRepository.findByUserId(1L);
+    public void commentUpVote(Long postId, Long commentId, User user) {
         boolean vote = commentUpvoteRepository.isUpVoted(postId, commentId, user.getUserId());
         if (!vote) {
             Optional<CommentDownVote> downvoteOptional =
@@ -41,8 +41,7 @@ public class VoteService {
         }
     }
 
-    public void commentDownVote(Long postId, Long commentId) {
-        User user = userRepository.findByUserId(1L);
+    public void commentDownVote(Long postId, Long commentId, User user) {
         boolean vote = commentDownVoteRepository.isDownVoted(postId, commentId, user.getUserId());
 
         if (!vote) {
@@ -63,8 +62,7 @@ public class VoteService {
         }
     }
 
-    public void replyUpVote(Long replyId, Long commentId) {
-        User user = userRepository.findByUserId(1L);
+    public void replyUpVote(Long replyId, Long commentId, User user) {
         boolean vote = replyUpVoteRepository.isUpVoted(replyId, commentId, user.getUserId());
         if (!vote) {
             Optional<ReplyDownVote> downvoteOptional =
@@ -83,8 +81,7 @@ public class VoteService {
         }
     }
 
-    public void replyDownVote(Long replyId, Long commentId) {
-        User user = userRepository.findByUserId(1L);
+    public void replyDownVote(Long replyId, Long commentId, User user) {
         boolean vote = replyDownVoteRepository.isDownVoted(replyId, commentId, user.getUserId());
 
         if (!vote) {
@@ -105,8 +102,7 @@ public class VoteService {
         }
     }
 
-    public void postUpVote(Long postId) {
-        User user = userRepository.findByUserId(1L);
+    public void postUpVote(Long postId, User user) {
         boolean vote = postUpVoteRepository.isUpVoted(postId, user.getUserId());
         if (!vote) {
             Optional<PostDownVote> downvoteOptional =
@@ -121,12 +117,12 @@ public class VoteService {
             upvote.setUserId(user.getUserId());
             postUpVoteRepository.save(upvote);
             incrementPostUpVote(postId);
+            incrementPostOwnerKarma(postId);
         }
     }
 
-    public void postDownVote(Long postId) {
-        User user = userRepository.findByUserId(1L);
-        boolean vote = postDownVoteRepository.isDownVoted(postId,user.getUserId());
+    public void postDownVote(Long postId, User user) {
+        boolean vote = postDownVoteRepository.isDownVoted(postId, user.getUserId());
 
         if (!vote) {
             Optional<PostUpVote> upvoteOptional =
@@ -142,6 +138,7 @@ public class VoteService {
             downVote.setUserId(user.getUserId());
             postDownVoteRepository.save(downVote);
             incrementPostDownVote(postId);
+            decrementPostOwnerKarma(postId);
         }
     }
 
@@ -218,4 +215,17 @@ public class VoteService {
         postRepository.save(post);
     }
 
+    public void incrementPostOwnerKarma(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        User user = userRepository.findByUserId(post.getUser().getUserId());
+        user.setKarma(user.getKarma() + 1);
+        userRepository.save(user);
+    }
+
+    public void decrementPostOwnerKarma(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        User user = userRepository.findByUserId(post.getUser().getUserId());
+        user.setKarma(user.getKarma() - 1);
+        userRepository.save(user);
+    }
 }

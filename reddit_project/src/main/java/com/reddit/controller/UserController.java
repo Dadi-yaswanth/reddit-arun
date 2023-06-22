@@ -2,6 +2,7 @@ package com.reddit.controller;
 
 
 import com.reddit.entity.User;
+import com.reddit.repository.UserRepository;
 import com.reddit.service.ProfilePhotoService;
 import com.reddit.service.UserService;
 import org.slf4j.Logger;
@@ -10,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -23,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.UUID;
 
 @Controller
@@ -31,13 +30,15 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ProfilePhotoService profilePhotoService;
+    @Autowired
+    private UserRepository userRepository;
     private static Logger log = LoggerFactory.getLogger(UserController.class);
     public static String uploadDirectory = System.getProperty("user.dir") + "/uploads";
 
     @GetMapping("/login")
-    public String userLogin(Model model) {
-        System.out.println("its working");
-        return "LoginPage";
+    public String userLogin(Principal principal, Model model) {
+        if(principal!= null)System.out.println(principal.getName());
+        return principal == null ? "LoginPage" : "redirect:/home";
     }
 
         @GetMapping("/chuck-user")
@@ -71,8 +72,8 @@ public class UserController {
     }
 
     @GetMapping("/newRegister")
-    public String registerPage(Model model) {
-        System.out.println("user added");
+    public String registerPage(Principal principal,Model model) {
+        if(principal != null) return "redirect:/home";
         model.addAttribute("user", new User());
         return "RegistrationPage.html";
     }
@@ -168,6 +169,13 @@ public class UserController {
     public String cancelChanges(@RequestParam("userId") Long userId, Model model) {
         User user = userService.getUserByID(userId);
         model.addAttribute("user", user);
+        return "UserProfile";
+    }
+
+    @GetMapping("/u/{username}")
+    public String getUserProfile(@PathVariable String username,Model model){
+        User user = userRepository.findByUsernameIgnoreCase(username).orElseThrow();
+        model.addAttribute("user",user);
         return "UserProfile";
     }
 }

@@ -3,6 +3,7 @@ package com.reddit.service;
 
 import com.reddit.entity.Community;
 import com.reddit.entity.Post;
+import com.reddit.entity.User;
 import com.reddit.repository.CommunityRepository;
 import com.reddit.repository.PostRepository;
 import com.reddit.repository.UserRepository;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +38,18 @@ public class HomeService {
         return postsOrderByPublishedAt;
     }
 
-    public void getPagePosts(Pageable page) {
+    public Page<Post> homePagePostsLoggedIn(int pageNumber, int size,User user){
+        Set<Community> communityMembers = user.getCommunityMembers();
 
+        if(communityMembers == null || communityMembers.size() == 0 )
+            return homePagePostsGeneral(pageNumber,size);
+
+        List<Long> followingCommunities = new ArrayList<>();
+        for(Community community : communityMembers){
+            followingCommunities.add(community.getCommunityId());
+        }
+        Pageable page = PageRequest.of(pageNumber - 1, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        return postRepository.findLoggedInUserPostsOrderByPublishedAt(followingCommunities,page);
     }
 
     public Page<?> searchPagePosts(int pageNumber, int size, String keyword, String type) {

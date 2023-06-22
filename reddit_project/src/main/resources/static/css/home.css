@@ -276,6 +276,7 @@ article {
 }
 .vote-img {
     width: 1.4rem;
+    cursor:pointer;
 }
 .post-media {
     /* padding: 20px; */
@@ -312,7 +313,7 @@ article {
 }
 .post-content {
     /* border: 2px solid red; */
-    padding: 0.7rem 0.6rem 0.6 0.7rem;
+    padding: 0.7rem 0.6rem 0.6rem 0.7rem;
 }
 
 .post-content p {

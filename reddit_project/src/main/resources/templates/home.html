@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Dashbord</title>
+    <title>Reddit | Home</title>
     <link rel="stylesheet" th:href="@{/css/home.css}"/>
 
 </head>
@@ -30,7 +31,7 @@
                 />
             </form>
         </div>
-        <div id="header-options">es
+        <div id="header-options">
             <a href="">
                 <img th:src="@{/images/popular.png}" alt="home" class=".header-options-img"/>
             </a>
@@ -55,12 +56,12 @@
 
             <div id="header-profile-details">
                 <div id="username-div">
-                    <p>sham_yaswanth</p>
+                    <p th:text="${userData.getUsername()}"></p>
                 </div>
 
                 <div id="karma-div">
                     <img th:src="@{/images/karma-star.png}" alt="star"/>
-                    <p>100786 karma</p>
+                    <p th:text="${userData.getKarma() + ' Karma'}"></p>
                 </div>
             </div>
         </div>
@@ -72,11 +73,23 @@
             <div id="posts-div">
                 <div class="post" th:each="postData : ${allPosts}">
                     <div class="post-vote-container">
-                        <a href=""><img th:src="@{images/upvote.png}" alt="" class="vote-img"/></a>
+                        <form action="" method="post" th:id="${'up-form-' + postData.getPostId()}"
+                              th:action="@{'/'+${postData.isCommunity ? 'r/' + postData.getCommunity().getCommunityName() : 'u/' + postData.getUser().getUsername()} +'/'+ ${postData.getPostId()}  + '/upvote'}"></form>
+                        <img
+                                th:src="@{/images/upvote.png}"
+                                alt=""
+                                class="vote-img upvote"
+                                th:id="${'post-up-' + postData.getPostId()}"
+                        />
                         <p th:text="${postData.getUpVotes() -  postData.getDownVotes()}"></p>
-                        <a href=""
-                        ><img th:src="@{images/downvote.png}" alt="" class="vote-img"
-                        /></a>
+                        <form action="" method="post"  th:id="${'down-form-' + postData.getPostId()}"
+                              th:action="@{'/'+${postData.isCommunity ? 'r/' + postData.getCommunity().getCommunityName() : 'u/' + postData.getUser().getUsername()} +'/'+ ${postData.getPostId()}  + '/down-vote'}"></form>
+                        <img
+                                th:src="@{/images/downvote.png}"
+                                alt=""
+                                class="vote-img downvote"
+                                th:id="${'post-down-' + postData.getPostId()}"
+                        />
                     </div>
 
                     <div class="post-data">
@@ -164,40 +177,24 @@
         <div id="nav-section">
             <div class="nav-heading"><p>YOUR COMMUNITIES</p></div>
             <div class="nav-content-box">
-                <a href="#">
+                <a href="/new-community">
                     <div class="content-element">
-                        <div class="content-img"><img src="plus.png" alt=""/></div>
+                        <div class="content-img"><img th:src="@{/images/plus.png}" alt=""/></div>
                         <div class="content-name"><p>Create Community</p></div>
                     </div>
                 </a>
-                <a href="#">
-                    <div class="content-element">
-                        <div class="content-img">
-                            <div class="nav-content-dp">
-                                <img src="dp.png" alt=""/>
+
+                <a href="" th:if="${userData.getCommunityMembers() != null}">
+                    <div th:each="sr : ${userData.getCommunityMembers()}">
+                        <div class="content-element">
+                            <div class="content-img">
+                                <div class="nav-content-dp">
+                                    <img th:src="@{/images/dp.png}" alt=""/>
+                                </div>
+                            </div>
+                            <div class="content-name"><p th:text="${'r/' + sr.getCommunityName()}"></p>
                             </div>
                         </div>
-                        <div class="content-name"><p>r/Communityname</p></div>
-                    </div>
-                </a>
-                <a href="#">
-                    <div class="content-element">
-                        <div class="content-img">
-                            <div class="nav-content-dp">
-                                <img src="dp.png" alt=""/>
-                            </div>
-                        </div>
-                        <div class="content-name"><p>r/Communityname</p></div>
-                    </div>
-                </a>
-                <a href="#">
-                    <div class="content-element">
-                        <div class="content-img">
-                            <div class="nav-content-dp">
-                                <img src="dp.png" alt=""/>
-                            </div>
-                        </div>
-                        <div class="content-name"><p>r/Communityname</p></div>
                     </div>
                 </a>
             </div>
@@ -208,7 +205,7 @@
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="home.png" alt=""/>
+                                <img th:src="@{/images/home.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>Home</p></div>
@@ -218,7 +215,7 @@
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="popular.png" alt=""/>
+                                <img th:src="@{/images/popular.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>Popular</p></div>
@@ -228,7 +225,7 @@
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="all.png" alt=""/>
+                                <img th:src="@{/images/all.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>All</p></div>
@@ -237,9 +234,9 @@
             </div>
             <div class="nav-heading"><p>OTHERS</p></div>
             <div class="nav-content-box">
-                <a href="#">
+                <a href="/new-post">
                     <div class="content-element">
-                        <div class="content-img"><img src="plus.png" alt=""/></div>
+                        <div class="content-img"><img th:src="@{/images/plus.png}" alt=""/></div>
                         <div class="content-name"><p>Create Post</p></div>
                     </div>
                 </a>
@@ -247,7 +244,7 @@
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="dp.png" alt=""/>
+                                <img th:src="@{/images/dp.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>User Settings</p></div>
@@ -257,17 +254,18 @@
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="avatar.png" alt=""/>
+                                <img th:src="@{/images/avatar.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>Avatar</p></div>
                     </div>
                 </a>
-                <a href="#">
+
+                <a href="/logout">
                     <div class="content-element">
                         <div class="content-img">
                             <div class="nav-content-dp">
-                                <img src="logout.png" alt=""/>
+                                <img th:src="@{/images/logout.png}" alt=""/>
                             </div>
                         </div>
                         <div class="content-name"><p>Logout</p></div>
@@ -277,5 +275,6 @@
         </div>
     </nav>
 </main>
+<script th:src="@{/js/home.js}"></script>
 </body>
 </html>

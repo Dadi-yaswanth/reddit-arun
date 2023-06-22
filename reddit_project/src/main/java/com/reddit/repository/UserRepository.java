@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.username = :username AND u.password = :password")
@@ -16,7 +18,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUserId(Long userId);
 
+    Optional<User> findByUsernameIgnoreCase(String username);
+
     @Query("SELECT DISTINCT u FROM User u WHERE " +
             "(u.username ILIKE %:word%) OR (u.displayName ILIKE %:word%)")
     Page<User> findUsersBySearchName(@Param("word") String keyword, Pageable pageable);
+
 }

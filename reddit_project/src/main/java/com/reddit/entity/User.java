@@ -38,6 +38,9 @@ public class User {
     @Column(name = "karma_value")
     private Long karma;
 
+    @Column(name = "roles")
+    private String roles;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private Timestamp createdAt;
